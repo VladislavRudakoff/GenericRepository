@@ -30,8 +30,8 @@ namespace TestTask.DAL
             modelBuilder.Entity<Role>().HasData(
                 new Role[]
                 {
-                new Role { Id=0, Name="User"},
-                new Role { Id=1, Name="Admin"},
+                new Role { Id=1, Name="User"},
+                new Role { Id=2, Name="Admin"},
                 });
         }
     }

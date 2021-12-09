@@ -3,29 +3,31 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TestTask.DAL;
 using TestTask.Models;
 
 namespace TestTask.Repositories
 {
     public class StoreRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class, IBaseEntity
     {
-        readonly DbContext dbContext;
-        readonly DbSet<TEntity> dbSet;
+        DbContext dbContext { get; }
+        DbSet<TEntity> dbSet { get; }
 
-        public StoreRepository(DbContext _dbContext)
+        public StoreRepository(StoreDbContext _dbContext)
         {
             dbContext = _dbContext;
             dbSet = dbContext.Set<TEntity>();
         }
 
-        public void Create([FromBody]TEntity model)
+        public virtual void Create(TEntity model)
         {
             dbSet.Add(model);
             dbContext.SaveChanges();
         }
 
-        public void Delete(TEntity model)
+        public void Delete(int id)
         {
+            var model = dbContext.Find<TEntity>(id);
             dbContext.Remove(model);
             dbContext.SaveChanges();
         }
@@ -40,11 +42,31 @@ namespace TestTask.Repositories
             return dbSet.AsNoTracking().Where(predicate).ToList();
         }
 
-        //TODO: Додумать как правильно передать ID для изменения строки
-        public void Update([FromBody]TEntity model)
+        public virtual void Update(TEntity model)
         {
             dbContext.Entry(model).State = EntityState.Modified;
             dbContext.SaveChanges();
+        }
+    }
+
+    public class UserRepository : StoreRepository<User>
+    {
+        public UserRepository(StoreDbContext _dbContext) : base(_dbContext)
+        {
+        }
+    }
+
+    public class OrderRepository : StoreRepository<Order>
+    {
+        public OrderRepository(StoreDbContext _dbContext) : base(_dbContext)
+        {
+        }
+    }
+
+    public class RoleRepository : StoreRepository<Role>
+    {
+        public RoleRepository(StoreDbContext _dbContext) : base(_dbContext)
+        {
         }
     }
 }

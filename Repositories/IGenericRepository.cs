@@ -13,6 +13,6 @@ namespace TestTask.Repositories
 
         void Update(TEntity item);
 
-        void Delete(TEntity item);
+        void Delete(int id);
     }
 }

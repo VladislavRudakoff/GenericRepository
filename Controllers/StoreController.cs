@@ -7,65 +7,66 @@ using TestTask.Repositories;
 namespace TestTask.Controllers
 {
     [ApiController]
-    public class StoreController<TValue> : ControllerBase where TValue : class, IBaseEntity, new()
+    [Route("api/[controller]")]
+    public class StoreController<TEntity> : ControllerBase where TEntity : class, IBaseEntity, new()
     {
-        readonly IGenericRepository<TValue> storeRepository;
-        readonly TValue modelInstance;
+        readonly IGenericRepository<TEntity> storeRepository;
 
-        public StoreController(StoreRepository<TValue> _repository)
+        public StoreController(IGenericRepository<TEntity> _repository)
         {
             storeRepository = _repository;
-            modelInstance = new TValue();
         }
 
-        [HttpPost("{modelInstance.GetType()}")]
-        public void Post()
+        [HttpPost]
+        public void Post([FromBody]TEntity entity)
         {
-            storeRepository.Create(modelInstance);
+            storeRepository.Create(entity);
         }
 
         [HttpGet]
-        public IEnumerable<TValue> GetAll()
+        public IEnumerable<TEntity> GetAll()
         {
             return storeRepository.GetAll();
         }
 
         [HttpGet("{id}")]
-        public IEnumerable<TValue> Get(int id)
+        public IEnumerable<TEntity> Get(int id)
         {
             return storeRepository.Get(x => x.Id == id);
         }
 
         [HttpPut]
-        public void Update(int id)
+        public void Update(int id, [FromBody] TEntity entity)
         {
-            modelInstance.Id = id;
-            storeRepository.Update(modelInstance);
+            entity.Id = id;
+            storeRepository.Update(entity);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            modelInstance.Id = id;
-            storeRepository.Delete(modelInstance);
+            storeRepository.Delete(id);
         }
 
     }
 
-    [ApiController]
-    [Route("api/[controller]")]
     public class UserController : StoreController<User>
     {
-        public UserController(StoreRepository<User> _repository) : base(_repository)
+        public UserController(IGenericRepository<User> _repository) : base(_repository)
         {
         }
     }
 
-    [ApiController]
-    [Route("api/[controller]")]
-    public class OderController : StoreController<Order>
+    public class OrderController : StoreController<Order>
     {
-        public OderController(StoreRepository<Order> _repository) : base(_repository)
+        public OrderController(IGenericRepository<Order> _repository) : base(_repository)
+        {
+        }
+    }
+
+    public class RoleController : StoreController<Role>
+    {
+        public RoleController(IGenericRepository<Role> _repository) : base(_repository)
         {
         }
     }
